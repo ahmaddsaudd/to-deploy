@@ -102,6 +102,9 @@ app.post("/api/login", async (req, res) => {
     res.send(error);
   }
 });
+app.get("/",(req,res)=>{
+  res.send("hello vercel");
+})
 
 // Getting User Details of login user
 app.get("/api/login", (req, res) => {
