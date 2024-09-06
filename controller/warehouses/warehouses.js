@@ -92,12 +92,24 @@ const updateSelectedWarehouse = async (req, res) => {
 
 // Search Warehouses
 const searchWarehouse = async (req, res) => {
-  const searchTerm = req.query.searchTerm;
-  const warehouses = await Warehouse.find({
-    name: { $regex: searchTerm, $options: "i" },
-  });
-  res.json(warehouses);
+  try {
+    // Ensure searchTerm is a valid string or fallback to an empty string if not provided
+    const searchTerm = req.query.searchTerm ? String(req.query.searchTerm) : '';
+
+    // Query the Warehouse collection using $regex with case-insensitive option "i"
+    const warehouses = await Warehouse.find({
+      name: { $regex: searchTerm, $options: "i" },
+    });
+
+    // Return the found warehouses in the response
+    res.json(warehouses);
+  } catch (error) {
+    // Log the error and send a 500 response in case of an issue
+    console.error("Error searching warehouses:", error);
+    res.status(500).json({ message: "An error occurred while searching for warehouses." });
+  }
 };
+
 
 module.exports = {
   addWarehouse,

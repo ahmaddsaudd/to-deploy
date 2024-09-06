@@ -106,11 +106,22 @@ const getAllGRNs = async (req, res) => {
 
 // Search GRNs
 const searchGRN = async (req, res) => {
-  const searchTerm = req.query.searchTerm;
-  const grns = await GRN.find({
-    name: { $regex: searchTerm, $options: "i" },
-  });
-  res.json(grns);
+  try {
+    // Ensure searchTerm is a valid string or provide a default empty string
+    const searchTerm = req.query.searchTerm ? String(req.query.searchTerm) : '';
+
+    // If searchTerm is empty, return an empty array or handle accordingly
+    const grns = await GRN.find({
+      name: { $regex: searchTerm, $options: "i" },
+    });
+
+    // Respond with the found GRNs
+    res.json(grns);
+  } catch (error) {
+    // Log the error and send a 500 response if something goes wrong
+    console.error("Error searching GRNs:", error);
+    res.status(500).json({ message: "An error occurred while searching GRNs." });
+  }
 };
 
 module.exports = {

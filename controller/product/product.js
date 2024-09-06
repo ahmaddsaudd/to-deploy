@@ -76,11 +76,22 @@ const updateSelectedProduct = async (req, res) => {
 
 // Search Products
 const searchProduct = async (req, res) => {
-  const searchTerm = req.query.searchTerm;
-  const products = await Product.find({
-    name: { $regex: searchTerm, $options: "i" },
-  });
-  res.json(products);
+  try {
+    // Ensure searchTerm is a string or provide a default value
+    const searchTerm = req.query.searchTerm ? String(req.query.searchTerm) : '';
+
+    // Perform the search only if searchTerm is not an empty string
+    const products = await Product.find({
+      name: { $regex: searchTerm, $options: "i" },
+    });
+
+    // Return the search results
+    res.json(products);
+  } catch (error) {
+    // Handle any potential errors
+    console.error("Error searching products:", error);
+    res.status(500).json({ message: "An error occurred during the search." });
+  }
 };
 
 module.exports = {

@@ -88,12 +88,23 @@ const updateSelectedItem = async (req, res) => {
 
 // Search Items
 const searchItem = async (req, res) => {
-  const searchTerm = req.query.searchTerm;
-  const items = await Item.find({
-    name: { $regex: searchTerm, $options: "i" },
-  });
-  res.json(items);
-};
+  try {
+    // Ensure searchTerm is a valid string, defaulting to an empty string if undefined or null
+    const searchTerm = req.query.searchTerm ? String(req.query.searchTerm) : '';
+
+    // Query the database using $regex with case-insensitive option "i"
+    const items = await Item.find({
+      name: { $regex: searchTerm, $options: "i" },
+    });
+
+    // Return the found items in the response
+    res.json(items);
+  } catch (error) {
+    // Log the error and send a 500 response in case of an issue
+    console.error("Error searching items:", error);
+    res.status(500).json({ message: "An error occurred while searching for items." });
+  }
+};  
 
 module.exports = {
   addItem,
