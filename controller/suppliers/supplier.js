@@ -95,11 +95,22 @@ const updateSelectedSupplier = async (req, res) => {
 
 // Search Supplier
 const searchSupplier = async (req, res) => {
-  const searchTerm = req.query.searchTerm;
-  const suppliers = await Supplier.find({
-    name: { $regex: searchTerm, $options: "i" },
-  });
-  res.json(suppliers);
+  try {
+    // Ensure searchTerm is a string, or fallback to an empty string
+    const searchTerm = req.query.searchTerm ? String(req.query.searchTerm) : '';
+
+    // Query the database using $regex with case-insensitive option "i"
+    const suppliers = await Supplier.find({
+      name: { $regex: searchTerm, $options: "i" },
+    });
+
+    // Return the found suppliers in the response
+    res.json(suppliers);
+  } catch (error) {
+    // Log the error and send a 500 response in case of an issue
+    console.error("Error searching suppliers:", error);
+    res.status(500).json({ message: "An error occurred while searching for suppliers." });
+  }
 };
 
 module.exports = {
